@@ -4,89 +4,69 @@
 class RegulatorPID
 {
 public:
-    enum LiczCalk {Wew, Zew}; //Sposób obliczania całki
+    enum LiczCalk { PROSTOKATNY, TRAPEZOWY, Wew, Zew, ZERO };
 
 private:
-    double Kp; //wzmocnienie
-    double Ti; //stała całkowania
-    double Td; //stała różniczkowania
-    double T;  //okres próbkowania
-
-    double uchyb_poprzedni; //poprzedni uchyb u(k-1)
-    double akum_wew;        //akumulator całki prostokątny trapezowy wew
-    double akum_zew;        //akumulator całki zew
-
+    double Kp;
+    double Ti;
+    double Td;
+    double T;
+    double uchyb_poprzedni;
+    double akum_wew;
+    double akum_zew;
     LiczCalk typCalki;
-    static constexpr double EPS = 1e-12; //stała do porównań z zerem
+    static constexpr double EPS = 1e-12;
 
 public:
-    double P; // Składnik proporcjonalny
-    double I; // Składnik całkujący
-    double D; // Składnik różniczkujący
+    double P;
+    double I;
+    double D;
 
     RegulatorPID(double Kp_ = 1.0, double Ti_ = 0.0, double Td_ = 0.0, double T_ = 1.0)
-        : Kp(Kp_)
-        , Ti(Ti_)
-        , Td(Td_)
-        , T(T_)
-        , uchyb_poprzedni(0.0)
-        , akum_wew(0.0)
-        , akum_zew(0.0)
-        , typCalki(Zew)
-        , P(0.0)
-        , I(0.0)
-        , D(0.0)
+        : Kp(Kp_), Ti(Ti_), Td(Td_), T(T_),
+        uchyb_poprzedni(0.0), akum_wew(0.0), akum_zew(0.0),
+        typCalki(PROSTOKATNY), P(0.0), I(0.0), D(0.0)
     {}
 
-    void reset() //resetowanie uchybu,? i ?
-    {
+    void reset() {
         uchyb_poprzedni = 0.0;
         akum_wew = 0.0;
         akum_zew = 0.0;
+        I = 0.0;
+        P = 0.0;
+        D = 0.0;
     }
 
-    void setKp(double kp)
-    { //seter wzmocnienia
-        Kp = kp;
-    }
-    void setTd(double td)
-    { //seter stałej różniczkowania
-        Td = td;
-    }
-    void setT(double t)
-    { //seter okresu próbkowania
-        T = t;
-    }
+    void setKp(double kp) { Kp = kp; }
+    void setTd(double td) { Td = td; }
+    void setT(double t) { T = t; }
+
     void setStalaCalk(double ti)
-    { //seter stałej całkowania
+    {
+        // Zeruj całkę przy zmianie Ti na 0
+        if (ti <= EPS && Ti > EPS) {
+            akum_wew = 0.0;
+            akum_zew = 0.0;
+            I = 0.0;
+        }
         Ti = ti;
     }
 
-    void setLiczCalk(LiczCalk metoda) //zmiana sposobu liczenia całki
-    {
-        if (typCalki
-            != metoda) { //sprawdzamy czy sposób liczenia na jaki chcemy zmienić jest inny od akutalnego
-            if (typCalki == Zew && metoda != Zew) { //tylko dla całki zew
-                double ZapiszTi;
-                if (Ti
-                    > EPS) { //jeśli Ti jest bardzo małe pobieramy wartość 1 aby uniknąć dzielenia przez 0
-                    ZapiszTi = Ti;
-                } else {
-                    ZapiszTi = 1.0;
-                };
-                akum_wew = akum_zew / ZapiszTi;
-            } else if (typCalki != Zew && metoda == Zew) { //zmiana z wew na zew
-                double ZapiszTi;
-                if (Ti
-                    > EPS) { //jeśli Ti jest bardzo małe pobieramy wartość 1 aby uniknąć mnożenia przez 0
-                    ZapiszTi = Ti;
-                } else {
-                    ZapiszTi = 1.0;
-                };
-                akum_zew = akum_wew * ZapiszTi;
+    void setLiczCalk(LiczCalk metoda) {
+        if (typCalki != metoda) {
+            if (Ti > EPS) {  // TYLKO jeśli Ti > 0
+                if (typCalki == Zew && metoda != Zew) {
+                    akum_wew = akum_zew / Ti;
+                } else if (typCalki != Zew && metoda == Zew) {
+                    akum_zew = akum_wew * Ti;
+                }
+            } else {
+                // Gdy Ti = 0, po prostu zeruj akumulatory
+                akum_wew = 0.0;
+                akum_zew = 0.0;
             }
         }
-        typCalki = metoda; //ustawiamy nowy aktualny typ liczenia całki
+        typCalki = metoda;
     }
 
     LiczCalk getLiczCalk() const { return typCalki; }
@@ -97,33 +77,29 @@ public:
         P = Kp * uchyb;
 
         // --- I ---
-
         bool czy_calka = (Ti > EPS);
 
         if (czy_calka) {
             switch (typCalki) {
-
             case Wew:
                 akum_wew += uchyb / Ti;
                 I = akum_wew;
                 break;
-
-
             case Zew:
-                akum_zew += uchyb;
+                akum_zew += T * uchyb;
                 I = akum_zew / Ti;
                 break;
-
-
+            default:
+                I = 0.0;
+                break;
             }
+        } else {
+            // Gdy Ti = 0, całka jest ZAWSZE 0
+            I = 0.0;
         }
 
         // --- D ---
-
-
-        D = Td * (uchyb - uchyb_poprzedni);
-        uchyb_poprzedni = uchyb;
-
+        D = Td * (uchyb - uchyb_poprzedni) / T;
 
         double PID = P + I + D;
         uchyb_poprzedni = uchyb;
