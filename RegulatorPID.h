@@ -94,41 +94,36 @@ public:
     double symuluj(double uchyb)
     {
         // --- P ---
-        P = Kp * uchyb; // ZAPISZ do P!
+        P = Kp * uchyb;
 
         // --- I ---
-        I = 0.0;
-        bool czy_calka = (typCalki != ZERO) && (Ti > EPS);
+
+        bool czy_calka = (Ti > EPS);
 
         if (czy_calka) {
             switch (typCalki) {
-            case PROSTOKATNY:
+
             case Wew:
-                akum_wew += (T / Ti) * uchyb;
+                akum_wew += uchyb / Ti;
                 I = akum_wew;
                 break;
 
-            case TRAPEZOWY:
-                akum_wew += (T / (2.0 * Ti)) * (uchyb + uchyb_poprzedni);
-                I = akum_wew;
-                break;
 
             case Zew:
                 akum_zew += T * uchyb;
                 I = akum_zew / Ti;
                 break;
 
-            default:
-                I = 0.0;
-                break;
+
             }
         }
 
         // --- D ---
-        D = 0.0; // Resetuj D
-        if (Td > EPS) {
+
+
             D = Td * (uchyb - uchyb_poprzedni) / T;
-        }
+        uchyb_poprzedni = uchyb;
+
 
         double PID = P + I + D;
         uchyb_poprzedni = uchyb;
