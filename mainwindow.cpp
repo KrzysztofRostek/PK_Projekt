@@ -25,6 +25,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->showMaximized();
 
+    on_spinBOX_WzmocK_editingFinished();
+    on_spinBOX_Amplituda_editingFinished();
+    on_spinBOX_Czstotliwosc_editingFinished();
+    on_spinBOX_Td_editingFinished();
+    on_spinBOX_Ti_editingFinished();
+    on_spinBOX_Interwal_editingFinished();
+    on_spinBox_Wypelnienie_editingFinished();
+    on_SpinBox_Stala_editingFinished();
+
     //----Serie----//
     seriaP = new QLineSeries();
     seriaI = new QLineSeries();
