@@ -121,7 +121,7 @@ public:
         // --- D ---
 
 
-            D = Td * (uchyb - uchyb_poprzedni) / T;
+        D = Td * (uchyb - uchyb_poprzedni) / T;
         uchyb_poprzedni = uchyb;
 
 
