@@ -4,7 +4,7 @@
 class RegulatorPID
 {
 public:
-    enum LiczCalk { PROSTOKATNY, TRAPEZOWY, Wew, Zew, ZERO }; //Sposób obliczania całki
+    enum LiczCalk {Wew, Zew}; //Sposób obliczania całki
 
 private:
     double Kp; //wzmocnienie
@@ -32,7 +32,7 @@ public:
         , uchyb_poprzedni(0.0)
         , akum_wew(0.0)
         , akum_zew(0.0)
-        , typCalki(PROSTOKATNY)
+        , typCalki(Zew)
         , P(0.0)
         , I(0.0)
         , D(0.0)
@@ -110,7 +110,7 @@ public:
 
 
             case Zew:
-                akum_zew += T * uchyb;
+                akum_zew += uchyb;
                 I = akum_zew / Ti;
                 break;
 
@@ -121,7 +121,7 @@ public:
         // --- D ---
 
 
-        D = Td * (uchyb - uchyb_poprzedni) / T;
+        D = Td * (uchyb - uchyb_poprzedni);
         uchyb_poprzedni = uchyb;
 
 

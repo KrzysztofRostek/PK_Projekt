@@ -174,7 +174,7 @@ void MainWindow::onKrokWykonany(double w, double y, double e, double u, int k, d
     regX->setRange(minX, maxX);
 
 
-    double progUsuwania = t - 300.0;
+    double progUsuwania = t - doceloweOknoCzasowe;
 
     if (progUsuwania > 0) {
         usunStarePunkty(seriaZad, progUsuwania);
