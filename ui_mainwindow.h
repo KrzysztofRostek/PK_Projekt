@@ -164,6 +164,7 @@ public:
         spinBoxOknoczasowe->setMinimumSize(QSize(0, 30));
         spinBoxOknoczasowe->setMinimum(5);
         spinBoxOknoczasowe->setMaximum(50);
+        spinBoxOknoczasowe->setValue(10);
 
         verticalLayout_12->addWidget(spinBoxOknoczasowe);
 
@@ -204,6 +205,10 @@ public:
         spinBOX_Interwal = new QDoubleSpinBox(groupBox_4);
         spinBOX_Interwal->setObjectName("spinBOX_Interwal");
         spinBOX_Interwal->setMinimumSize(QSize(0, 30));
+        spinBOX_Interwal->setDecimals(0);
+        spinBOX_Interwal->setMinimum(10.000000000000000);
+        spinBOX_Interwal->setMaximum(1000.000000000000000);
+        spinBOX_Interwal->setValue(50.000000000000000);
 
         verticalLayout_5->addWidget(spinBOX_Interwal);
 
@@ -259,6 +264,10 @@ public:
         spinBOX_Amplituda = new QDoubleSpinBox(groupBox);
         spinBOX_Amplituda->setObjectName("spinBOX_Amplituda");
         spinBOX_Amplituda->setMinimumSize(QSize(0, 30));
+        spinBOX_Amplituda->setDecimals(1);
+        spinBOX_Amplituda->setMaximum(1000.000000000000000);
+        spinBOX_Amplituda->setSingleStep(0.100000000000000);
+        spinBOX_Amplituda->setValue(1.000000000000000);
 
         horizontalLayout_3->addWidget(spinBOX_Amplituda);
 
@@ -275,6 +284,9 @@ public:
         spinBOX_Czstotliwosc = new QDoubleSpinBox(groupBox);
         spinBOX_Czstotliwosc->setObjectName("spinBOX_Czstotliwosc");
         spinBOX_Czstotliwosc->setMinimumSize(QSize(0, 30));
+        spinBOX_Czstotliwosc->setMaximum(1000.000000000000000);
+        spinBOX_Czstotliwosc->setSingleStep(0.010000000000000);
+        spinBOX_Czstotliwosc->setValue(3.000000000000000);
 
         horizontalLayout_6->addWidget(spinBOX_Czstotliwosc);
 
@@ -292,7 +304,8 @@ public:
         spinBox_Wypelnienie = new QDoubleSpinBox(groupBox);
         spinBox_Wypelnienie->setObjectName("spinBox_Wypelnienie");
         spinBox_Wypelnienie->setMinimumSize(QSize(0, 30));
-        spinBox_Wypelnienie->setMaximum(1000.000000000000000);
+        spinBox_Wypelnienie->setMaximum(1.000000000000000);
+        spinBox_Wypelnienie->setValue(0.500000000000000);
 
         horizontalLayout_15->addWidget(spinBox_Wypelnienie);
 
@@ -350,6 +363,9 @@ public:
         spinBOX_Td = new QDoubleSpinBox(groupBox_3);
         spinBOX_Td->setObjectName("spinBOX_Td");
         spinBOX_Td->setMinimumSize(QSize(0, 30));
+        spinBOX_Td->setMaximum(1000.000000000000000);
+        spinBOX_Td->setSingleStep(0.100000000000000);
+        spinBOX_Td->setValue(0.200000000000000);
 
         horizontalLayout_8->addWidget(spinBOX_Td);
 
@@ -377,6 +393,9 @@ public:
         spinBOX_Ti = new QDoubleSpinBox(groupBox_3);
         spinBOX_Ti->setObjectName("spinBOX_Ti");
         spinBOX_Ti->setMinimumSize(QSize(0, 30));
+        spinBOX_Ti->setMaximum(1000.000000000000000);
+        spinBOX_Ti->setSingleStep(0.100000000000000);
+        spinBOX_Ti->setValue(5.000000000000000);
 
         horizontalLayout_9->addWidget(spinBOX_Ti);
 
@@ -393,6 +412,10 @@ public:
         spinBOX_WzmocK = new QDoubleSpinBox(groupBox_3);
         spinBOX_WzmocK->setObjectName("spinBOX_WzmocK");
         spinBOX_WzmocK->setMinimumSize(QSize(82, 30));
+        spinBOX_WzmocK->setDecimals(1);
+        spinBOX_WzmocK->setMaximum(1000.000000000000000);
+        spinBOX_WzmocK->setSingleStep(0.100000000000000);
+        spinBOX_WzmocK->setValue(0.500000000000000);
 
         horizontalLayout_20->addWidget(spinBOX_WzmocK);
 

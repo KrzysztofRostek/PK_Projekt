@@ -312,28 +312,19 @@ void MainWindow::on_Square_Button_clicked()
 void MainWindow::on_spinBOX_WzmocK_editingFinished()
 {
     symulator.setPID_Kp(ui->spinBOX_WzmocK->value());
-    ui->spinBOX_WzmocK->setMinimum(0.0);
-    ui->spinBOX_WzmocK->setMaximum(1000.0);
-    ui->spinBOX_WzmocK->setSingleStep(0.1);
-    ui->spinBOX_WzmocK->setDecimals(1);
+
 }
 
 void MainWindow::on_spinBOX_Amplituda_editingFinished()
 {
     symulator.setGeneratorA(ui->spinBOX_Amplituda->value());
-    ui->spinBOX_Amplituda->setMinimum(0.0);
-    ui->spinBOX_Amplituda->setMaximum(1000.0);
-    ui->spinBOX_Amplituda->setSingleStep(0.1);
-    ui->spinBOX_Amplituda->setDecimals(1);
+
 }
 
 void MainWindow::on_spinBOX_Czstotliwosc_editingFinished()
 {
     symulator.setGeneratorTRZ(ui->spinBOX_Czstotliwosc->value());
-    ui->spinBOX_Czstotliwosc->setMinimum(0.01);
-    ui->spinBOX_Czstotliwosc->setMaximum(1000.0);
-    ui->spinBOX_Czstotliwosc->setSingleStep(0.01);
-    ui->spinBOX_Czstotliwosc->setDecimals(2);
+
 }
 
 void MainWindow::on_spinBox_Wypelnienie_editingFinished()
@@ -349,19 +340,13 @@ void MainWindow::on_SpinBox_Stala_editingFinished()
 void MainWindow::on_spinBOX_Td_editingFinished()
 {
     symulator.setPID_Td(ui->spinBOX_Td->value());
-    ui->spinBOX_Td->setMinimum(0.0);
-    ui->spinBOX_Td->setMaximum(1000.0);
-    ui->spinBOX_Td->setSingleStep(0.1);
-    ui->spinBOX_Td->setDecimals(2);
+
 }
 
 void MainWindow::on_spinBOX_Ti_editingFinished()
 {
     symulator.setPID_Ti(ui->spinBOX_Ti->value());
-    ui->spinBOX_Ti->setMinimum(0.0);
-    ui->spinBOX_Ti->setMaximum(1000.0);
-    ui->spinBOX_Ti->setSingleStep(0.1);
-    ui->spinBOX_Ti->setDecimals(1);
+
 }
 
 void MainWindow::on_spinBOX_Interwal_editingFinished()
@@ -373,11 +358,6 @@ void MainWindow::on_spinBOX_Interwal_editingFinished()
     symulator.setInterwalMs(nowyInterwal);
     symulator.setPID_T(nowyInterwal / 1000.0);
 
-
-    ui->spinBOX_Interwal->setMaximum(1000);
-    ui->spinBOX_Interwal->setMinimum(10);
-    ui->spinBOX_Interwal->setSingleStep(1);
-    ui->spinBOX_Interwal->setDecimals(0);
 }
 
 void MainWindow::on_radio_przed_toggled(bool checked)
