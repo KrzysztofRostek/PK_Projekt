@@ -101,10 +101,16 @@ private:
     double arx_yMax = 10.0;
     bool arx_ograniczenia = true;
 
+    double aktualnaSzerokoscOkna;
+    const double MARGINES_BEZPIECZENSTWA = 0.5;
+
     // --- Funkcje pomocnicze
     void wyczyscWykresy();
     void dopasujSkalePionowa(QValueAxis *osY, QList<QLineSeries*> serie);
-    void usunStarePunkty(QLineSeries *seria, double minCzas);
+
+
+    void aktualizujZakresOsiX(double krokAnimacji, double wymaganeOkno, double aktualnyCzas);
+    void czyscStareDane(double aktualnyCzas);
 };
 
 #endif // MAINWINDOW_H

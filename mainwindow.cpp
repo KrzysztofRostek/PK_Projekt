@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
     on_spinBox_Wypelnienie_editingFinished();
     on_SpinBox_Stala_editingFinished();
 
+    doceloweOknoCzasowe = ui->spinBoxOknoczasowe->value();
+    aktualnaSzerokoscOkna = doceloweOknoCzasowe;
+
     //----Serie----//
     seriaP = new QLineSeries();
     seriaI = new QLineSeries();
@@ -137,19 +140,57 @@ MainWindow::MainWindow(QWidget *parent)
     RegulatorchartView->setMinimumSize(0, 300);
 }
 
+void MainWindow::aktualizujZakresOsiX(double krokAnimacji, double wymaganeOkno, double aktualnyCzas)
+{
+    // Dazenie do zadanego okna
+    if (aktualnaSzerokoscOkna < wymaganeOkno) {
+        aktualnaSzerokoscOkna = std::min(wymaganeOkno, aktualnaSzerokoscOkna + krokAnimacji);
+    }
+    else if (aktualnaSzerokoscOkna > wymaganeOkno) {
+        aktualnaSzerokoscOkna = std::max(wymaganeOkno, aktualnaSzerokoscOkna - krokAnimacji);
+    }
 
-void MainWindow::onKrokWykonany(double w, double y, double e, double u, int k, double P, double I, double D)
+    // Obliczenie startu osi. Jeśli czas < okno startujemy od 0.
+    double poczatekOsi = (aktualnyCzas > aktualnaSzerokoscOkna) ? (aktualnyCzas - aktualnaSzerokoscOkna) : 0.0;
+
+    // Ustawienie zakresow dla wszystkich osi
+    if(mainX) mainX->setRange(poczatekOsi, aktualnyCzas);
+    if(pidX) pidX->setRange(poczatekOsi, aktualnyCzas);
+    if(uchybX) uchybX->setRange(poczatekOsi, aktualnyCzas);
+    if(regX) regX->setRange(poczatekOsi, aktualnyCzas);
+}
+
+void MainWindow::czyscStareDane(double aktualnyCzas)
 {
 
-    double dt = symulator.getInterwalMs() / 1000.0;
+    if (!seriaZad || seriaZad->count() == 0) return;
+    double maxHistoria = ui->spinBoxOknoczasowe->maximum();
 
+    // Granice usuwania
+    double progOdciecia = aktualnyCzas - maxHistoria - MARGINES_BEZPIECZENSTWA;
+
+
+    while (seriaZad->count() > 0 && seriaZad->at(0).x() < progOdciecia)
+    {
+        seriaZad->remove(0);
+        seriaRegulowana->remove(0);
+        if(seriaP->count() > 0) seriaP->remove(0);
+        if(seriaI->count() > 0) seriaI->remove(0);
+        if(seriaD->count() > 0) seriaD->remove(0);
+        if(seriaUchyb->count() > 0) seriaUchyb->remove(0);
+        if(seriaRegulator->count() > 0) seriaRegulator->remove(0);
+    }
+}
+void MainWindow::onKrokWykonany(double w, double y, double e, double u, int k, double P, double I, double D)
+{
+    double dt = symulator.getInterwalMs() / 1000.0;
 
     if (k == 0) aktualnyCzasSymulacji = 0.0;
     else aktualnyCzasSymulacji += dt;
 
     double t = aktualnyCzasSymulacji;
 
-
+    // Dodawanie punktow
     seriaZad->append(t, w);
     seriaRegulowana->append(t, y);
     seriaP->append(t, P);
@@ -158,33 +199,12 @@ void MainWindow::onKrokWykonany(double w, double y, double e, double u, int k, d
     seriaUchyb->append(t, e);
     seriaRegulator->append(t, u);
 
+    // Obsługa plynnej osi X
+    // 0.2 to predkosc animacji zmiany okna
+    aktualizujZakresOsiX(0.2, doceloweOknoCzasowe, t);
 
-    double minX = 0;
-    double maxX = std::max(t, doceloweOknoCzasowe);
-
-    if (t > doceloweOknoCzasowe) {
-        minX = t - doceloweOknoCzasowe;
-        maxX = t;
-    }
-
-
-    mainX->setRange(minX, maxX);
-    pidX->setRange(minX, maxX);
-    uchybX->setRange(minX, maxX);
-    regX->setRange(minX, maxX);
-
-
-    double progUsuwania = t - 300.0;
-
-    if (progUsuwania > 0) {
-        usunStarePunkty(seriaZad, progUsuwania);
-        usunStarePunkty(seriaRegulowana, progUsuwania);
-        usunStarePunkty(seriaP, progUsuwania);
-        usunStarePunkty(seriaI, progUsuwania);
-        usunStarePunkty(seriaD, progUsuwania);
-        usunStarePunkty(seriaUchyb, progUsuwania);
-        usunStarePunkty(seriaRegulator, progUsuwania);
-    }
+    // Usuwanie starych danych
+    czyscStareDane(t);
 
 
     if (k % 2 == 0) {
@@ -194,23 +214,6 @@ void MainWindow::onKrokWykonany(double w, double y, double e, double u, int k, d
         dopasujSkalePionowa(regY, {seriaRegulator});
     }
 }
-
-
-void MainWindow::usunStarePunkty(QLineSeries *seria, double minCzas)
-{
-    if (!seria || seria->count() == 0) return;
-
-
-    while (seria->count() > 0) {
-        if (seria->at(0).x() < minCzas) {
-            seria->remove(0);
-        } else {
-            break;
-        }
-    }
-}
-
-
 void MainWindow::dopasujSkalePionowa(QValueAxis *osY, QList<QLineSeries*> serie)
 {
     double minVal = 999999.0;
@@ -312,28 +315,19 @@ void MainWindow::on_Square_Button_clicked()
 void MainWindow::on_spinBOX_WzmocK_editingFinished()
 {
     symulator.setPID_Kp(ui->spinBOX_WzmocK->value());
-    ui->spinBOX_WzmocK->setMinimum(0.0);
-    ui->spinBOX_WzmocK->setMaximum(1000.0);
-    ui->spinBOX_WzmocK->setSingleStep(0.1);
-    ui->spinBOX_WzmocK->setDecimals(1);
+
 }
 
 void MainWindow::on_spinBOX_Amplituda_editingFinished()
 {
     symulator.setGeneratorA(ui->spinBOX_Amplituda->value());
-    ui->spinBOX_Amplituda->setMinimum(0.0);
-    ui->spinBOX_Amplituda->setMaximum(1000.0);
-    ui->spinBOX_Amplituda->setSingleStep(0.1);
-    ui->spinBOX_Amplituda->setDecimals(1);
+
 }
 
 void MainWindow::on_spinBOX_Czstotliwosc_editingFinished()
 {
     symulator.setGeneratorTRZ(ui->spinBOX_Czstotliwosc->value());
-    ui->spinBOX_Czstotliwosc->setMinimum(0.01);
-    ui->spinBOX_Czstotliwosc->setMaximum(1000.0);
-    ui->spinBOX_Czstotliwosc->setSingleStep(0.01);
-    ui->spinBOX_Czstotliwosc->setDecimals(2);
+
 }
 
 void MainWindow::on_spinBox_Wypelnienie_editingFinished()
@@ -349,19 +343,13 @@ void MainWindow::on_SpinBox_Stala_editingFinished()
 void MainWindow::on_spinBOX_Td_editingFinished()
 {
     symulator.setPID_Td(ui->spinBOX_Td->value());
-    ui->spinBOX_Td->setMinimum(0.0);
-    ui->spinBOX_Td->setMaximum(1000.0);
-    ui->spinBOX_Td->setSingleStep(0.1);
-    ui->spinBOX_Td->setDecimals(2);
+
 }
 
 void MainWindow::on_spinBOX_Ti_editingFinished()
 {
     symulator.setPID_Ti(ui->spinBOX_Ti->value());
-    ui->spinBOX_Ti->setMinimum(0.0);
-    ui->spinBOX_Ti->setMaximum(1000.0);
-    ui->spinBOX_Ti->setSingleStep(0.1);
-    ui->spinBOX_Ti->setDecimals(1);
+
 }
 
 void MainWindow::on_spinBOX_Interwal_editingFinished()
@@ -373,11 +361,6 @@ void MainWindow::on_spinBOX_Interwal_editingFinished()
     symulator.setInterwalMs(nowyInterwal);
     symulator.setPID_T(nowyInterwal / 1000.0);
 
-
-    ui->spinBOX_Interwal->setMaximum(1000);
-    ui->spinBOX_Interwal->setMinimum(10);
-    ui->spinBOX_Interwal->setSingleStep(1);
-    ui->spinBOX_Interwal->setDecimals(0);
 }
 
 void MainWindow::on_radio_przed_toggled(bool checked)
