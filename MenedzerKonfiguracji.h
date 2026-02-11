@@ -22,6 +22,8 @@ public:
                             const std::vector<double>& b,
                             int opoznienie,
                             double odchylenie,
+                            double uMin, double uMax,
+                            double yMin, double yMax,
                             double Kp,
                             double Ti,
                             double Td,
@@ -40,6 +42,10 @@ public:
         arxObj["wektorB"] = wektorDoJson(b);
         arxObj["opoznienie"] = opoznienie;
         arxObj["odchylenie"] = odchylenie;
+        arxObj["sterowanie_min"] = uMin;
+        arxObj["sterowanie_max"] = uMax;
+        arxObj["regulowana_min"] = yMin;
+        arxObj["regulowana_max"] = yMax;
         json["arx"] = arxObj;
 
         QJsonObject pidObj;
@@ -63,18 +69,21 @@ public:
         QFile plik(sciezka);
 
         if (!plik.open(QIODevice::WriteOnly)) {
-            return 0;
+            return false;
         }
 
         plik.write(doc.toJson(QJsonDocument::Indented));
         plik.close();
-        return 1;
+        return true;
     }
+
     bool wczytajKonfiguracje(const QString& sciezka,
                              std::vector<double>& a,
                              std::vector<double>& b,
                              int& opoznienie,
                              double& odchylenie,
+                             double& uMin, double& uMax,
+                             double& yMin, double& yMax,
                              double& Kp,
                              double& Ti,
                              double& Td,
@@ -88,7 +97,7 @@ public:
     {
         QFile plik(sciezka);
         if (!plik.open(QIODevice::ReadOnly)) {
-            return 0;
+            return false;
         }
 
         QByteArray dane = plik.readAll();
@@ -96,17 +105,31 @@ public:
 
         QJsonDocument doc = QJsonDocument::fromJson(dane);
         if (doc.isNull()) {
-            return 0;
+            return false;
         }
 
         QJsonObject json = doc.object();
 
+        // Domyślne wartości
+        a.clear();
+        b.clear();
+        opoznienie = 1;
+        odchylenie = 0.0;
+        uMin = -10.0;
+        uMax = 10.0;
+        yMin = -10.0;
+        yMax = 10.0;
+
         if (json.contains("arx")) {
             QJsonObject arx = json["arx"].toObject();
-            a = jsonDoWektora(arx["wektorA"].toArray());
-            b = jsonDoWektora(arx["wektorB"].toArray());
-            opoznienie = arx["opoznienie"].toInt(1);
-            odchylenie = arx["odchylenie"].toDouble(0.0);
+            if (arx.contains("wektorA")) a = jsonDoWektora(arx["wektorA"].toArray());
+            if (arx.contains("wektorB")) b = jsonDoWektora(arx["wektorB"].toArray());
+            if (arx.contains("opoznienie")) opoznienie = arx["opoznienie"].toInt();
+            if (arx.contains("odchylenie")) odchylenie = arx["odchylenie"].toDouble();
+            if (arx.contains("sterowanie_min")) uMin = arx["sterowanie_min"].toDouble();
+            if (arx.contains("sterowanie_max")) uMax = arx["sterowanie_max"].toDouble();
+            if (arx.contains("regulowana_min")) yMin = arx["regulowana_min"].toDouble();
+            if (arx.contains("regulowana_max")) yMax = arx["regulowana_max"].toDouble();
         }
 
         if (json.contains("pid")) {
@@ -115,7 +138,6 @@ public:
             Ti = pid["Ti"].toDouble(0.0);
             Td = pid["Td"].toDouble(0.0);
             typCalki = pid["typCalki"].toInt(0);
-
         }
 
         if (json.contains("generator")) {
@@ -124,12 +146,12 @@ public:
             amplituda = gen["amplituda"].toDouble(1.0);
             czestotliwosc = gen["czestotliwosc"].toDouble(1.0);
             StalaSkladniowa = gen["StalaSkladniowa"].toDouble(0.0);
-            Wypelnienie = gen["Wypelnienie"].toDouble(0.0);
+            Wypelnienie = gen["Wypelnienie"].toDouble(0.5);
         }
 
         interwalMs = json["interwalMs"].toInt(200);
 
-        return 1;
+        return true;
     }
 
 private:

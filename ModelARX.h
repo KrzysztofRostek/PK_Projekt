@@ -98,7 +98,7 @@ public:
     double symuluj(double WartSter)
     {
         if(ograniczenia){
-        WartSter = saturacja(WartSter, umin, umax);
+        WartSter = saturacja(WartSter, ymin, ymax);
         }
         // przesunięcie historii sterowania
         for (int i = 29; i > 0; --i) {

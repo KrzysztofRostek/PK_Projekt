@@ -471,7 +471,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1671, 21));
+        menubar->setGeometry(QRect(0, 0, 1671, 22));
         menuUAR = new QMenu(menubar);
         menuUAR->setObjectName("menuUAR");
         MainWindow->setMenuBar(menubar);
@@ -493,11 +493,11 @@ public:
         START_Button->setText(QCoreApplication::translate("MainWindow", "START", nullptr));
         STOP_Bttun->setText(QCoreApplication::translate("MainWindow", "STOP", nullptr));
         RESET_Button->setText(QCoreApplication::translate("MainWindow", "RESET", nullptr));
-        label_9->setText(QCoreApplication::translate("MainWindow", "Okno czasowe", nullptr));
+        label_9->setText(QCoreApplication::translate("MainWindow", "Okno czasowe[s]", nullptr));
         Konf_ARX_Button->setText(QCoreApplication::translate("MainWindow", "Konfiguracja ARX", nullptr));
         Wczytaj_Button->setText(QCoreApplication::translate("MainWindow", "Wczytaj", nullptr));
         Zapisz_Button->setText(QCoreApplication::translate("MainWindow", "Zapisz", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "Interwa\305\202", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Interwa\305\202[ms]", nullptr));
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "sygna\305\202", nullptr));
         Sin_Button->setText(QCoreApplication::translate("MainWindow", "sinus", nullptr));
         Square_Button->setText(QCoreApplication::translate("MainWindow", "square", nullptr));

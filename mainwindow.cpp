@@ -21,6 +21,11 @@ MainWindow::MainWindow(QWidget *parent)
     , aktualnyWektorB({0.6})
     , aktualneOpoznienie(1)
     , aktualnySzum(0.0)
+    , arx_uMin(-10.0)
+    , arx_uMax(10.0)
+    , arx_yMin(-10.0)
+    , arx_yMax(10.0)
+    , arx_ograniczenia(true)
 {
     ui->setupUi(this);
     this->showMaximized();
@@ -377,13 +382,11 @@ void MainWindow::on_radio_pod_toggled(bool checked)
 
 void MainWindow::on_Reset_d_clicked()
 {
-    ui->spinBOX_Td->setValue(0);
     symulator.setPID_Td(0);
 }
 
 void MainWindow::on_Reset_i_clicked()
 {
-    ui->spinBOX_Ti->setValue(0);
     symulator.setPID_Ti(0);
 }
 
@@ -402,28 +405,45 @@ void MainWindow::on_RESET_Button_clicked()
     symulator.reset();
 
 
-    symulator.setPID_Kp(0); ui->spinBOX_WzmocK->setValue(0);
-    symulator.setPID_Ti(0); ui->spinBOX_Ti->setValue(0);
-    symulator.setPID_Td(0); ui->spinBOX_Td->setValue(0);
+    symulator.setPID_Kp(0.5);
+    ui->spinBOX_WzmocK->setValue(0.5);
+    symulator.setPID_Ti(5.0);
+    ui->spinBOX_Ti->setValue(5.0);
+    symulator.setPID_Td(0.2);
+    ui->spinBOX_Td->setValue(0.2);
 
-    symulator.setGeneratorA(0); ui->spinBOX_Amplituda->setValue(0);
-    symulator.setGeneratorTRZ(1.0); ui->spinBOX_Czstotliwosc->setValue(1.0);
-    symulator.setGeneratorTT(200); ui->spinBOX_Interwal->setValue(200);
-    symulator.setGeneratorS(0); ui->SpinBox_Stala->setValue(0);
-    symulator.setGeneratorP(0.5); ui->spinBox_Wypelnienie->setValue(0.5);
+    symulator.setGeneratorA(1.0);
+    ui->spinBOX_Amplituda->setValue(1.0);
+    symulator.setGeneratorTRZ(3.0);
+    ui->spinBOX_Czstotliwosc->setValue(3.0);
+    symulator.setGeneratorTT(50);
+    ui->spinBOX_Interwal->setValue(50);
+    symulator.setGeneratorS(0.0);
+    ui->SpinBox_Stala->setValue(0.0);
+    symulator.setGeneratorP(0.5);
+    ui->spinBox_Wypelnienie->setValue(0.5);
 
-    symulator.setInterwalMs(200);
+    symulator.setInterwalMs(50);
     symulator.setPID_T(0.2);
 
     symulator.setPID_TypCalki(RegulatorPID::Zew);
     ui->radio_przed->setChecked(true);
     ui->radio_pod->setChecked(false);
 
-    aktualnyWektorA = {0};
-    aktualnyWektorB = {0};
+    aktualnyWektorA = {-0.4};
+    aktualnyWektorB = {0.6};
     aktualneOpoznienie = 1;
     aktualnySzum = 0.0;
     symulator.setARX(aktualnyWektorA, aktualnyWektorB, aktualneOpoznienie, aktualnySzum);
+    arx_uMax = 10.0;
+    arx_uMin = -10.0;
+    arx_yMax = 10.0;
+    arx_yMin = -10.0;
+    symulator.setPID_Umin(-10.0);
+    symulator.setPID_Umax(10.0);
+    symulator.setARX_Ymax(10.0);
+    symulator.setARX_Ymin(-10.0);
+    symulator.setPID_Ograniczenia(true);
 
     wyczyscWykresy();
 }
@@ -452,6 +472,10 @@ void MainWindow::ustawARXDane(const std::vector<double> &a,
     symulator.setARX_Ymin(yMin);
     symulator.setARX_Ymax(yMax);
     symulator.setARX_Ograniczenia(aktywne);
+
+    symulator.setPID_Umin(uMin);
+    symulator.setPID_Umax(uMax);
+    symulator.setPID_Ograniczenia(aktywne);
 }
 
 void MainWindow::on_Konf_ARX_Button_clicked()
@@ -474,9 +498,16 @@ void MainWindow::on_Zapisz_Button_clicked()
 
     bool sukces = menedzerKonfig.zapiszKonfiguracje(
         sciezka,
-        aktualnyWektorA, aktualnyWektorB, aktualneOpoznienie, aktualnySzum,
-        ui->spinBOX_WzmocK->value(), ui->spinBOX_Ti->value(),
-        ui->spinBOX_Td->value(), ui->radio_przed->isChecked() ? 0 : 1,
+        aktualnyWektorA,
+        aktualnyWektorB,
+        aktualneOpoznienie,
+        aktualnySzum,
+        arx_uMin, arx_uMax,
+        arx_yMin, arx_yMax,
+        ui->spinBOX_WzmocK->value(),
+        ui->spinBOX_Ti->value(),
+        ui->spinBOX_Td->value(),
+        ui->radio_przed->isChecked() ? 0 : 1,
         ui->Sin_Button->isChecked() ? 0 : 1,
         ui->spinBOX_Amplituda->value(),
         ui->spinBOX_Czstotliwosc->value(),
@@ -485,8 +516,10 @@ void MainWindow::on_Zapisz_Button_clicked()
         ui->spinBOX_Interwal->value()
         );
 
-    if (sukces) QMessageBox::information(this ,"sukces", "konfiguracja zapisana");
-    else QMessageBox::warning(this, "blad", "nie udało sie zapisac");
+    if (sukces)
+        QMessageBox::information(this, "Sukces", "Konfiguracja zapisana");
+    else
+        QMessageBox::warning(this, "Błąd", "Nie udało się zapisać");
 }
 
 void MainWindow::on_Wczytaj_Button_clicked()
@@ -502,40 +535,47 @@ void MainWindow::on_Wczytaj_Button_clicked()
     int interwalMs;
 
     bool sukces = menedzerKonfig.wczytajKonfiguracje(
-        sciezka, a, b, opoznienie, odchylenie, Kp, Ti, Td, typCalki,
+        sciezka, a, b, opoznienie, odchylenie,arx_uMin,arx_uMax,arx_yMin,arx_yMax, Kp, Ti, Td, typCalki,
         trybGeneratora, amplituda, czestotliwosc, StalaSkladniowa, Wypelnienie, interwalMs
         );
 
     if (sukces) {
-        aktualnyWektorA = a;
-        aktualnyWektorB = b;
-        aktualneOpoznienie = opoznienie;
-        aktualnySzum = odchylenie;
+        QString sciezka = QFileDialog::getOpenFileName(this, "Wczytaj konfigurację", "", "JSON (*.json)");
+        if (sciezka.isEmpty()) return;
 
-        symulator.setARX(a, b, opoznienie, odchylenie);
+        std::vector<double> a, b;
+        int opoznienie;
+        double odchylenie, Kp, Ti, Td;
+        int typCalki, trybGeneratora;
+        double amplituda, StalaSkladniowa, Wypelnienie, czestotliwosc;
+        int interwalMs;
+        double uMin, uMax, yMin, yMax;
 
-        ui->spinBOX_WzmocK->setValue(Kp);
-        ui->spinBOX_Ti->setValue(Ti);
-        ui->spinBOX_Td->setValue(Td);
+        bool sukces = menedzerKonfig.wczytajKonfiguracje(
+            sciezka, a, b, opoznienie, odchylenie,
+            uMin, uMax, yMin, yMax,
+            Kp, Ti, Td, typCalki,
+            trybGeneratora, amplituda, czestotliwosc,
+            StalaSkladniowa, Wypelnienie, interwalMs
+            );
 
-        if (typCalki == 0) {
-            ui->radio_przed->setChecked(true); ui->radio_pod->setChecked(false);
-        } else {
-            ui->radio_przed->setChecked(false); ui->radio_pod->setChecked(true);
-        }
+        if (sukces) {
+            aktualnyWektorA = a;
+            aktualnyWektorB = b;
+            aktualneOpoznienie = opoznienie;
+            aktualnySzum = odchylenie;
+            arx_uMin = uMin;
+            arx_uMax = uMax;
+            arx_yMin = yMin;
+            arx_yMax = yMax;
 
-        if (trybGeneratora == 0) {
-            ui->Sin_Button->setChecked(true); ui->Square_Button->setChecked(false);
-        } else {
-            ui->Sin_Button->setChecked(false); ui->Square_Button->setChecked(true);
-        }
-
-        ui->spinBOX_Amplituda->setValue(amplituda);
-        ui->spinBOX_Czstotliwosc->setValue(czestotliwosc);
-        ui->SpinBox_Stala->setValue(StalaSkladniowa);
-        ui->spinBox_Wypelnienie->setValue(Wypelnienie);
-        ui->spinBOX_Interwal->setValue(interwalMs);
-
+            symulator.setARX(a, b, opoznienie, odchylenie);
+            symulator.setARX_Umin(uMin);
+            symulator.setARX_Umax(uMax);
+            symulator.setARX_Ymin(yMin);
+            symulator.setARX_Ymax(yMax);
+            symulator.setPID_Umin(uMin);
+            symulator.setPID_Umax(uMax);
 
         on_spinBOX_Interwal_editingFinished();
         on_spinBOX_WzmocK_editingFinished();
@@ -544,4 +584,5 @@ void MainWindow::on_Wczytaj_Button_clicked()
     } else {
         QMessageBox::warning(this, "blad", "nie udało sie wczytac");
     }
+}
 }

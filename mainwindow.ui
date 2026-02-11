@@ -99,7 +99,7 @@
                <item>
                 <widget class="QLabel" name="label_9">
                  <property name="text">
-                  <string>Okno czasowe</string>
+                  <string>Okno czasowe[s]</string>
                  </property>
                 </widget>
                </item>
@@ -175,7 +175,7 @@
                <item>
                 <widget class="QLabel" name="label">
                  <property name="text">
-                  <string>Interwał</string>
+                  <string>Interwał[ms]</string>
                  </property>
                 </widget>
                </item>
@@ -618,7 +618,7 @@
      <x>0</x>
      <y>0</y>
      <width>1671</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuUAR">

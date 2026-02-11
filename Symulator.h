@@ -108,7 +108,10 @@ public:
     void setARX_Umax(double umax) { arx.setUmax(umax); }
     void setARX_Ymin(double ymin) { arx.setYmin(ymin); }
     void setARX_Ymax(double ymax) { arx.setYmax(ymax); }
+    void setPID_Umin(double umin) { pid.setUmin(umin); }
+    void setPID_Umax(double umax) { pid.setUmax(umax); }
     void setARX_Ograniczenia(bool aktywne) {arx.setOgraniczenia(aktywne);}
+    void setPID_Ograniczenia(bool aktywne) {pid.setOgraniczenia(aktywne);}
 
 
     // Ręczny krok symulacji
