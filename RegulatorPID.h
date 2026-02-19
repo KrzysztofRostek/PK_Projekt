@@ -4,7 +4,7 @@
 class RegulatorPID
 {
 public:
-    enum LiczCalk { PROSTOKATNY, TRAPEZOWY, Wew, Zew, ZERO };
+    enum LiczCalk { PROSTOKATNY, Wew, Zew };
 
 private:
     double Kp;
