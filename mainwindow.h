@@ -35,7 +35,7 @@ public slots:
                       bool aktywne);
 
 private slots:
-    // --- Obsługa przycisków i kontrolek UI
+    // Obsługa przycisków i kontrolek UI
     void on_Sin_Button_clicked();
     void on_Square_Button_clicked();
     void on_spinBOX_WzmocK_editingFinished();
@@ -58,7 +58,7 @@ private slots:
     void on_SpinBox_Stala_editingFinished();
     void on_spinBoxOknoczasowe_editingFinished();
 
-    // --- Główny slot odbierający dane z symulatora
+    //  Główny slot odbierający dane z symulatora
     void onKrokWykonany(double w, double y, double e, double u, int k, double P, double I, double D);
 
 private:
@@ -67,7 +67,7 @@ private:
     ARXwindow *arxwindow = nullptr;
     SymulatorUAR symulator;
 
-    // --- Wykresy i Serie
+    //  Wykresy i Serie
     QLineSeries *seriaP;
     QLineSeries *seriaI;
     QLineSeries *seriaD;
@@ -76,7 +76,7 @@ private:
     QLineSeries *seriaRegulowana;
     QLineSeries *seriaZad;
 
-    // --- Osie ---
+    //  Osie 
     QValueAxis *mainX;
     QValueAxis *mainY;
     QValueAxis *uchybX;
@@ -86,7 +86,7 @@ private:
     QValueAxis *pidX;
     QValueAxis *pidY;
 
-    // --- Zmienne pomocnicze do logiki wykresu
+    // Zmienne pomocnicze do logiki wykresu
     double doceloweOknoCzasowe;
     double aktualnyCzasSymulacji;
 
@@ -104,7 +104,7 @@ private:
     double aktualnaSzerokoscOkna;
     const double MARGINES_BEZPIECZENSTWA = 0.5;
 
-    // --- Funkcje pomocnicze
+    //  Funkcje pomocnicze
     void wyczyscWykresy();
     void dopasujSkalePionowa(QValueAxis *osY, QList<QLineSeries*> serie);
 
@@ -114,3 +114,4 @@ private:
 };
 
 #endif // MAINWINDOW_H
+
