@@ -29,7 +29,7 @@ private:
     QTimer timer;
 
 public:
-    // KONSTRUKTOR - INLINE
+    // KONSTRUKTOR 
     SymulatorUAR(const GeneratorSygnalu &gen,
                  const RegulatorPID &pid_,
                  const ModelARX &arx_,
@@ -163,3 +163,4 @@ private slots:
         k++;
     }
 };
+
