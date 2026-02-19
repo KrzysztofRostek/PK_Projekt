@@ -10,7 +10,7 @@
 #include <QtCharts/QLineSeries>
 #include <QDebug>
 
-// --- KONSTRUKTOR ---
+//KONSTRUKTOR
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     doceloweOknoCzasowe = ui->spinBoxOknoczasowe->value();
     aktualnaSzerokoscOkna = doceloweOknoCzasowe;
 
-    //----Serie----//
+    //Serie
     seriaP = new QLineSeries();
     seriaI = new QLineSeries();
     seriaD = new QLineSeries();
@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     seriaZad = new QLineSeries();
     seriaRegulowana = new QLineSeries();
 
-    //----Tytuły----//
+    //Tytuły
     seriaZad->setName("Wartość zadana");
     seriaRegulowana->setName("Wartość regulowana");
     seriaP->setName("P");
@@ -60,10 +60,10 @@ MainWindow::MainWindow(QWidget *parent)
     seriaUchyb->setName("Uchyb");
     seriaRegulator->setName("Sterowanie u");
 
-    //----Połączenie z symulatorem----//
+    //Połączenie z symulatorem
     connect(&symulator, &SymulatorUAR::krokWykonany, this, &MainWindow::onKrokWykonany);
 
-    //----Konfiguracja Wykresu Głównego (MAIN)----//
+    //Konfiguracja Wykresu Głównego
     QChart *Mainchart = new QChart();
     QChartView *MainchartView = new QChartView(Mainchart);
     Mainchart->setAnimationOptions(QChart::NoAnimation);
@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
     MainchartView->setRenderHint(QPainter::Antialiasing);
     ui->horizontalLayout_5->addWidget(MainchartView);
 
-    //----Konfiguracja Wykresu PID----//
+    //Konfiguracja Wykresu PID
     QChart *PIDchart = new QChart();
     QChartView *PIDchartView = new QChartView(PIDchart);
     PIDchart->setAnimationOptions(QChart::NoAnimation);
@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
     PIDchartView->setRenderHint(QPainter::Antialiasing);
     ui->horizontalLayout_4->addWidget(PIDchartView, 1);
 
-    //----Konfiguracja Wykresu Uchybu----//
+    //Konfiguracja Wykresu Uchybu
     QChart *Uchybchart = new QChart();
     QChartView *UchybchartView = new QChartView(Uchybchart);
     Uchybchart->setAnimationOptions(QChart::NoAnimation);
@@ -125,7 +125,7 @@ MainWindow::MainWindow(QWidget *parent)
     UchybchartView->setRenderHint(QPainter::Antialiasing);
     ui->horizontalLayout_4->addWidget(UchybchartView, 1);
 
-    //----Konfiguracja Wykresu Regulatora----//
+    //Konfiguracja Wykresu Regulatora
     QChart *Regulatorchart = new QChart();
     QChartView *RegulatorchartView = new QChartView(Regulatorchart);
     Regulatorchart->setAnimationOptions(QChart::NoAnimation);
@@ -257,7 +257,7 @@ void MainWindow::dopasujSkalePionowa(QValueAxis *osY, QList<QLineSeries*> serie)
     }
 }
 
-// --- ZMIANA OKNA CZASOWEGO ---
+// ZMIANA OKNA CZASOWEGO
 void MainWindow::on_spinBoxOknoczasowe_editingFinished()
 {
     doceloweOknoCzasowe = ui->spinBoxOknoczasowe->value();
@@ -281,7 +281,7 @@ void MainWindow::on_spinBoxOknoczasowe_editingFinished()
     }
 }
 
-// --- CZYSZCZENIE WYKRESÓW ---
+// CZYSZCZENIE WYKRESÓW
 void MainWindow::wyczyscWykresy()
 {
     seriaZad->clear();
@@ -586,3 +586,4 @@ void MainWindow::on_Wczytaj_Button_clicked()
     }
 }
 }
+
