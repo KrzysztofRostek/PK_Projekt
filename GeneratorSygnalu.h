@@ -43,7 +43,7 @@ public:
     Tryb getTryb() const { return tryb; }
     int getTT() const { return TT; }
 
-    // Generuj wartość na podstawie czasu (nie indeksu próbki)
+    // Generuj wartość na podstawie czasu 
     double generuj(int i)
     {
         // Oblicz czas dla tego kroku
@@ -53,7 +53,7 @@ public:
             // Reset lub pierwsze wywołanie
             czasAkumulowany = 0;
         } else {
-            // Normalny postęp - dodaj interwał czasu
+            // Normalny postęp
             czasAkumulowany += deltaCzas;
         }
 
@@ -71,11 +71,11 @@ public:
             double pozycjaWOkresie = fmod(czasAkumulowany, okres);
             double czasWlaczenia = okres * p;
 
-            // Dla prostokąta: 0 do A (lub S do A+S)
+            // Dla prostokąta: 0 do A 
             if (pozycjaWOkresie < czasWlaczenia) {
-                return A + S; // stan wysoki: A + S
+                return A + S; // stan wysoki
             } else {
-                return S; // stan niski: tylko S (0 + S)
+                return S; // stan niski
             }
         }
         default: {
@@ -90,3 +90,4 @@ public:
         ostatniKrok = -1;
     }
 };
+
