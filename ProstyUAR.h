@@ -33,26 +33,19 @@ public:
               GeneratorSygnalu &gen,
               int k)
     {
-        // 1. wartość zadana
+        // wartość zadana
         generator = gen.generuj(k);
 
-        // 2. uchyb
+        // uchyb
         uchyb = generator - wartwyjsc_poprzedni;
 
-        // 3. regulator
+        // regulator
         PID = pid.symuluj(uchyb);
-     /*   const double MAX_STEROWANIE = 100.0;
-        if (PID > MAX_STEROWANIE) {
-            PID = MAX_STEROWANIE;
-        }
-        if (PID < -MAX_STEROWANIE) {
-            PID = -MAX_STEROWANIE;
-        }
-*/
-        // 4. obiekt ARX
+
+        // obiekt ARX
         WartWyjsc = obiekt.symuluj(PID);
 
-        // 5. aktualizacja pamięci
+        // aktualizacja pamięci
         wartwyjsc_poprzedni = WartWyjsc;
     }
     double symuluj(double wartosczadana)
@@ -70,3 +63,4 @@ public:
         return WartWyjsc; //zwracamy wartość
     }
 };
+
